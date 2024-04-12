@@ -90,6 +90,9 @@ ON Bookings.facid = Facilities.facid
 WHERE Facilities.facid IN (0, 1)
 ORDER BY firstname;
 
+SELECT CONCAT_WS('',firstname,' ', surname) AS member_name
+FROM Members;
+
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
 different costs to members (the listed costs are per half-hour 'slot'), and
