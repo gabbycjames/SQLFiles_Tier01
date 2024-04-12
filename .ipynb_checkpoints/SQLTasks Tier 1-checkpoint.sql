@@ -81,13 +81,14 @@ Include in your output the name of the court, and the name of the member
 formatted as a single column. Ensure no duplicate data, and order by
 the member name. */
 
-SELECT firstname, surname, Members.memid, Bookings.facid, name
+SELECT DISTINCT firstname, surname AS member_name, Members.memid, name
 FROM Members
 INNER JOIN Bookings
 ON Members.memid = Bookings.memid
 Inner JOIN Facilities
 ON Bookings.facid = Facilities.facid
-
+WHERE Facilities.facid IN (0, 1)
+ORDER BY firstname;
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
