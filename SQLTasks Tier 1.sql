@@ -97,7 +97,7 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
-SELECT DISTINCT name, CONCAT_WS('',firstname,' ', surname) AS member_name, membercost, guestcost
+SELECT name, CONCAT_WS('',firstname,' ', surname) AS name, membercost, guestcost
 FROM Members
 INNER JOIN Bookings
 ON Members.memid = Bookings.memid
@@ -107,6 +107,19 @@ WHERE Bookings.starttime LIKE '2012-09-14%' AND (membercost > 30 OR guestcost > 
 ORDER BY Facilities.membercost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
+
+SELECT CONCAT_WS('',firstname,' ', surname) AS name, sub.name AS facility, sub.membercost, sub.guestcost
+FROM (
+SELECT Bookings.facid, Bookings.memid, Bookings.starttime, Facilities.membercost, Facilities.guestcost, Facilities.name
+FROM Bookings
+INNER JOIN Facilities
+ON Bookings.facid = Facilities.facid
+WHERE Bookings.starttime LIKE '2012-09-14%'
+AND (Facilities.membercost > 30 OR Facilities.guestcost > 30)
+) AS sub
+INNER JOIN Members
+ON sub.memid  = Members.memid
+ORDER BY sub.membercost DESC;
 
 
 /* PART 2: SQLite
