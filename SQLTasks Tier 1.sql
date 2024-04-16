@@ -81,17 +81,14 @@ Include in your output the name of the court, and the name of the member
 formatted as a single column. Ensure no duplicate data, and order by
 the member name. */
 
-SELECT DISTINCT firstname, surname AS member_name, Members.memid, name
+SELECT DISTINCT CONCAT_WS('',firstname,' ', surname) AS member_name, Members.memid, name
 FROM Members
 INNER JOIN Bookings
 ON Members.memid = Bookings.memid
-Inner JOIN Facilities
+INNER JOIN Facilities
 ON Bookings.facid = Facilities.facid
-WHERE Facilities.facid IN (0, 1)
-ORDER BY firstname;
-
-SELECT CONCAT_WS('',firstname,' ', surname) AS member_name
-FROM Members;
+WHERE Facilities.facid IN (0,1)
+ORDER BY member_name;
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
@@ -100,6 +97,14 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
+SELECT DISTINCT name, CONCAT_WS('',firstname,' ', surname) AS member_name, membercost, guestcost
+FROM Members
+INNER JOIN Bookings
+ON Members.memid = Bookings.memid
+INNER JOIN Facilities
+ON Bookings.facid = Facilities.facid
+WHERE Bookings.starttime LIKE '2012-09-14%' AND (membercost > 30 OR guestcost > 30)
+ORDER BY Facilities.membercost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
