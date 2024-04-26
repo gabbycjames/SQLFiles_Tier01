@@ -97,14 +97,19 @@ the guest user's ID is always 0. Include in your output the name of the
 facility, the name of the member formatted as a single column, and the cost.
 Order by descending cost, and do not use any subqueries. */
 
-SELECT name, CONCAT_WS('',firstname,' ', surname) AS name, membercost, guestcost
-FROM Members
-INNER JOIN Bookings
-ON Members.memid = Bookings.memid
+SELECT Facilities.name AS facility, CONCAT_WS('',firstname,' ', surname) AS name, 
+CASE 
+WHEN Facilities.memid = 0
+THEN membercost*slots
+ELSE guestcost* slots
+END AS cost
+FROM Bookings
 INNER JOIN Facilities
 ON Bookings.facid = Facilities.facid
-WHERE Bookings.starttime LIKE '2012-09-14%' AND (membercost > 30 OR guestcost > 30)
-ORDER BY Facilities.membercost DESC;
+INNER JOIN Facilities
+ON Members.memid = Bookings.memid
+WHERE Bookings.starttime LIKE '2012-09-14%' AND ((Bookings.memid = 0 AND membercost*slots > 30) OR (Bookings.memid != 0 AND guestcost*slots > 30))
+ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
