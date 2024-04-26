@@ -114,24 +114,23 @@ ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
-SELECT CONCAT_WS('',firstname,' ', surname) AS name, sub.name AS facility
+SELECT *
 FROM (
-SELECT Bookings.facid, Bookings.memid, Bookings.starttime, Facilities.membercost, Facilities.guestcost, Facilities.name,
+SELECT CONCAT_WS('', firstname,' ', surname) AS name, Facilities.name AS facility,
 CASE
 WHEN Bookings.memid = 0
-THEN sub.membercost * Bookings.slots
-ELSE sub.guestcost * Bookings.slots
+THEN guestcost * Bookings.slots
+ELSE membercost * Bookings.slots
 END AS cost
 FROM Bookings
 INNER JOIN Facilities
 ON Bookings.facid = Facilities.facid
-WHERE Bookings.starttime LIKE '2012-09-14%'
-AND ((Bookings.memid != 0) AND (Facilities.membercost*Bookings.slots > 30)) OR ((Bookings.memid = 0) AND (Facilities.guestcost*Bookings.slots > 30))
-) AS sub
+AND Bookings.starttime LIKE '2012-09-14%'
 INNER JOIN Members
-ON sub.memid  = Members.memid
-ORDER BY sub.membercost DESC;
-
+ON Bookings.memid  = Members.memid
+) AS sub
+WHERE sub.cost > 30
+ORDER BY sub.cost DESC;
 
 /* PART 2: SQLite
 /* We now want you to jump over to a local instance of the database on your machine. 
