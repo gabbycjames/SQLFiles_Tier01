@@ -42,14 +42,14 @@ WHERE membercost > 0.0;
 
 SELECT COUNT(name) AS count_no_fee
 FROM Facilities
-WHERE membercost > 0.0;
+WHERE membercost = 0.0;
 
 /* Q3: Write an SQL query to show a list of facilities that charge a fee to members,
 where the fee is less than 20% of the facility's monthly maintenance cost.
 Return the facid, facility name, member cost, and monthly maintenance of the
 facilities in question. */
 
-SELECT facid, name, monthlymaintenance
+SELECT facid, name, membercost, monthlymaintenance
 FROM Facilities
 WHERE membercost < (0.2 * monthlymaintenance) AND membercost > 0.0;
 
