@@ -99,28 +99,34 @@ Order by descending cost, and do not use any subqueries. */
 
 SELECT Facilities.name AS facility, CONCAT_WS('',firstname,' ', surname) AS name, 
 CASE 
-WHEN Facilities.memid = 0
-THEN membercost*slots
-ELSE guestcost* slots
+WHEN Bookings.memid = 0
+THEN guestcost * slots
+ELSE membercost * slots
 END AS cost
 FROM Bookings
 INNER JOIN Facilities
 ON Bookings.facid = Facilities.facid
-INNER JOIN Facilities
+INNER JOIN Members
 ON Members.memid = Bookings.memid
-WHERE Bookings.starttime LIKE '2012-09-14%' AND ((Bookings.memid = 0 AND membercost*slots > 30) OR (Bookings.memid != 0 AND guestcost*slots > 30))
+WHERE Bookings.starttime LIKE '2012-09-14%' 
+AND (((Bookings.memid != 0) AND (Facilities.membercost*Bookings.slots > 30)) OR ((Bookings.memid = 0) AND (Facilities.guestcost*Bookings.slots > 30)))
 ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
-SELECT CONCAT_WS('',firstname,' ', surname) AS name, sub.name AS facility, sub.membercost, sub.guestcost
+SELECT CONCAT_WS('',firstname,' ', surname) AS name, sub.name AS facility
 FROM (
-SELECT Bookings.facid, Bookings.memid, Bookings.starttime, Facilities.membercost, Facilities.guestcost, Facilities.name
+SELECT Bookings.facid, Bookings.memid, Bookings.starttime, Facilities.membercost, Facilities.guestcost, Facilities.name,
+CASE
+WHEN Bookings.memid = 0
+THEN sub.membercost * Bookings.slots
+ELSE sub.guestcost * Bookings.slots
+END AS cost
 FROM Bookings
 INNER JOIN Facilities
 ON Bookings.facid = Facilities.facid
 WHERE Bookings.starttime LIKE '2012-09-14%'
-AND (Facilities.membercost > 30 OR Facilities.guestcost > 30)
+AND ((Bookings.memid != 0) AND (Facilities.membercost*Bookings.slots > 30)) OR ((Bookings.memid = 0) AND (Facilities.guestcost*Bookings.slots > 30))
 ) AS sub
 INNER JOIN Members
 ON sub.memid  = Members.memid
